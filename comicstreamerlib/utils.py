@@ -257,6 +257,12 @@ def is_valid_ipv6_address(address):
         return False
     return True
 
+def hashfile(inputFile):
+    openedFile = open(inputFile)
+    readFile = openedFile.read()
+    return hash(readFile)
+    openedFile.close()
+
 def hash(image):
     hashersha1 = hashlib.sha1()
     hashersha1.update(image)
