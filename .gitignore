@@ -30,3 +30,5 @@ mac/pyinstaller/
 pdftopng
 
 qpdf
+libunrar/unrar.lib
+libunrar/unrar.dll

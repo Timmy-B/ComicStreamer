@@ -15,7 +15,7 @@
 	OutFile "ComicStreamer ${RELEASE_STR}.exe"
 	;OutFile "ComicStreamer.exe"
 
-    Caption "ComicStreamer: ToiletStreamer Edition! ${RELEASE_STR} Installer"
+    Caption "ComicStreamer: ComicStreamer Edition! ${RELEASE_STR} Installer"
 
 	;Default installation folder
 	InstallDir "$PROGRAMFILES\ComicStreamer"

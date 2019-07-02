@@ -53,15 +53,15 @@
     self.run()
     File "/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/threading.py", line 754, in run
     self.__target(*self.__args, **self.__kwargs)
-    File "/Users/Tristan/ToiletStreamer/comicstreamerlib/monitor.py", line 87, in mainLoop
+    File "/Users/Tristan/ComicStreamer/comicstreamerlib/monitor.py", line 87, in mainLoop
     self.dofullScan(self.paths)
-    File "/Users/Tristan/ToiletStreamer/comicstreamerlib/monitor.py", line 320, in dofullScan
+    File "/Users/Tristan/ComicStreamer/comicstreamerlib/monitor.py", line 320, in dofullScan
     md = self.getComicMetadata(filename)
-    File "/Users/Tristan/ToiletStreamer/comicstreamerlib/monitor.py", line 196, in getComicMetadata
+    File "/Users/Tristan/ComicStreamer/comicstreamerlib/monitor.py", line 196, in getComicMetadata
     image_data = ca.getPage(0)
-    File "/Users/Tristan/ToiletStreamer/comicapi/comicarchive.py", line 915, in getPage
+    File "/Users/Tristan/ComicStreamer/comicapi/comicarchive.py", line 915, in getPage
     image_data = self.archiver.readArchiveFile( filename )
-    File "/Users/Tristan/ToiletStreamer/comicapi/comicarchive.py", line 616, in readArchiveFile
+    File "/Users/Tristan/ComicStreamer/comicapi/comicarchive.py", line 616, in readArchiveFile
     return subprocess.check_output(['mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
     File "/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/subprocess.py", line 573, in check_output
     raise CalledProcessError(retcode, cmd, output=output)

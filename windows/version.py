@@ -35,7 +35,7 @@ VSVersionInfo(
         StringStruct(u'InternalName', u'comicstreamer'),
         StringStruct(u'LegalCopyright', u'© Tristan Crispijn. All rights reserved.'),
         StringStruct(u'OriginalFilename', u'comicstreamer'),
-        StringStruct(u'ProductName', u'ComicStreamer: ToiletStreamer Edition'),
+        StringStruct(u'ProductName', u'ComicStreamer: TimmyB Edition'),
         StringStruct(u'ProductVersion', u'0.9.5.1')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])

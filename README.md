@@ -1,4 +1,4 @@
-# ComicStream: ToiletStreamer Edition Alpha
+# ComicStream: ComicStreamer Edition Alpha
 
 Improved ComicStreamer!
 
