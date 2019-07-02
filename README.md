@@ -37,8 +37,6 @@ _...Or general web page_
 Please help!
 
 Did I say I got stuck for a year now on MySQL and SQLAlchemy...
-
-![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    
 ## Work done
 
