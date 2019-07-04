@@ -2,11 +2,6 @@
 import os
 import platform
 
-if platform.system() == "Windows":
-    os.environ['UNRAR_LIB_PATH'] = os.path.dirname(os.path.realpath(__file__)) + '/libunrar/unrar.dll'
-else:
-    os.environ['UNRAR_LIB_PATH'] = os.path.dirname(os.path.realpath(__file__)) + '/libunrar/libunrar.so'
-
 from comicstreamerlib.main import main
 
 main()
