@@ -33,6 +33,7 @@ import utils
 import math
 import re
 
+
 class IssueString:
 	def __init__(self, text):
 	
@@ -51,7 +52,7 @@ class IssueString:
 		if len(text) == 0:
 			return	
 		
-		text = unicode(text)
+		text = text.decode('utf-8')
 		
 		#skip the minus sign if it's first
 		if text[0] == '-':
