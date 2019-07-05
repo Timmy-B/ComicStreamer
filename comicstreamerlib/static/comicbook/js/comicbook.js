@@ -1655,7 +1655,7 @@ var ComicBook = (function ($) {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent)) {
       this.isMobile = true;
       document.body.classList.add('mobile');
-      defaults.displayMode = 'single';
+      defaults.displayMode = 'double';
 
       window.addEventListener('load', function () {
         setTimeout(function () {

@@ -568,3 +568,7 @@ body:not(.mobile) .toolbar li:hover>.dropdown {
 	float: right;
 	margin: 0;
 }
+
+#content{
+	background-color: #282828;
+}

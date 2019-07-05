@@ -1938,15 +1938,15 @@ class ComicArchive:
                     #if basename < '0':
                     #	k = os.path.join(os.path.split(k)[0], "z" + basename)
                     return k.lower()
-                try:
+                # try:
                     files = natsorted(files, key=keyfunc,signed=False)
-                except:
-                    # "HERE FIX patch ...bug with strange encoding... should we check zip/rar/etc files for encoding?
-                    try:
-                        files = natsorted([i.decode('windows-1252') for i in files], key=keyfunc,signed=False)
-                    except:
-                        print "COMIC ERROR: FILES NOT SORTED"
-                        return files
+                # except:
+                #     # "HERE FIX patch ...bug with strange encoding... should we check zip/rar/etc files for encoding?
+                #     try:
+                #         files = natsorted([i.decode('windows-1252') for i in files], key=keyfunc,signed=False)
+                #     except:
+                #         print "COMIC ERROR: FILES NOT SORTED"
+                #         return files
 
             # make a sub-list of image files
             self.page_list = []
