@@ -15,5 +15,5 @@ unrar>=0.3
 watchdog>=0.8.3
 paver==1.2.4
 pylzma>=0.4.8
-# pybonjour==1.1.1
+https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/pybonjour/pybonjour-1.1.1.tar.gz
 lxml>=3.7.0

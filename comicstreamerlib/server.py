@@ -930,7 +930,7 @@ class MainHandler(BaseHandler):
 
         recently_added_comics = self.library.recentlyAddedComics(10)
         recently_read_comics = self.library.recentlyReadComics(10)
-        roles_list = [role.name for role in self.library.getRoles()]
+        # roles_list = [role.name for role in self.library.getRoles()]
         random_comic = self.library.randomComic()
 
         if random_comic is None:
@@ -975,8 +975,29 @@ class RecentlyPageHandler(BaseHandler):
                     recently_read = list(recently_read_comics),
                     api_key = self.application.config['security']['api_key']
                     )
+        
+class PublishersPageHandeler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        publishers_list = self.library.publishers()
+        self.render(deviceroot(self)+"publishers.html",
+                    publishers=list(publishers_list),
+                    api_key=self.application.config['security']['api_key']
+                    )
 
-
+class PublisherPageHandeler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self, args):
+        if args is not None:
+            args = urllib.unquote(args.replace("/", "") )
+        print args
+        # publisher = self.get_argument('publisher', None)
+        print "handeler sees: "+ args
+        series_list = self.library.seriesByPublisher(args)
+        self.render(deviceroot(self)+"publisher.html",
+                    series=list(series_list),
+                    api_key=self.application.config['security']['api_key']
+                    )
 
 class SearchPageHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1684,6 +1705,8 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/entities/browse(/.*)*", EntitiesBrowserHandler),
             (self.webroot + r"/comic/([0-9]+)/reader", ReaderHandler),
             (self.webroot + r"/login", LoginHandler),
+            (self.webroot + r"/publishers", PublishersPageHandeler),
+            (self.webroot + r"/publisher(/.*)*", PublisherPageHandeler),
             # Data
             (self.webroot + r"/dbinfo", DBInfoAPIHandler),
             (self.webroot + r"/version", VersionAPIHandler),

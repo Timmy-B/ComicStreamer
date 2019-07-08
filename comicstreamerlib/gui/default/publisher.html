@@ -1,0 +1,26 @@
+{% set title = "ComicStreamer" %}
+{% include head/main.html %}
+
+    <div class="ncover_list">
+        {% for item in series %}
+            {% block item %}
+            <div class="coverContainer">
+            <div class="thumbContainer">
+                <a href="{{handler.webroot}}/comiclist/browse?series={{item.series}}" > <!-- target="_blank" -->
+                    <img class="thumb" src="{{handler.webroot}}/comic/{{item.id}}/thumbnail?api_key={{api_key}}">
+                </a>
+            </div>
+                <div class="labelContainer">
+                <div class="label">{{item.series}} ({{item.volume}})</div>
+                <div class="label">{{item.id}}</div>
+                </div>
+            </div>
+            {% end %}
+        {% end %}
+    </div>
+
+{% include foot/foot.html %}
+
+
+
+

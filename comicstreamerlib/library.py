@@ -19,10 +19,12 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import subqueryload
+from sqlalchemy import func
+from sqlalchemy.sql import label
 import shutil
 import utils
 from database import Comic, Blacklist, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
-    StoryArc, Genre, DeletedComic,AlternateSeries
+    StoryArc, Genre, DeletedComic, AlternateSeries, Publisher
 from folders import AppFolders
 from sqlalchemy.orm import load_only
 
@@ -202,7 +204,7 @@ class Library:
                 
                 #blacklist.comic_id = int(comic_id)
                 #blacklist.page = int(pagenum)
-                blacklist.ts = datetime.datetime.utcnow()
+                blacklist.ts = datetime.utcnow()
                 session.add(blacklist)
                 session.commit()
                 session.close()
@@ -477,17 +479,26 @@ class Library:
 
     def getComicPaths(self):
         return self.getSession().query(Comic.id, Comic.path, Comic.mod_ts).all()
-
+        
+    def publishers(self):
+        return self.getSession().query(Comic.publisher).group_by(Comic.publisher).all()
+    
+    def seriesByPublisher(self, string = ''):
+        print "lets get: " + string
+        return self.getSession().query(Comic.series, func.min(Comic.issue).label("issue"), Comic.id, Comic.publisher, Comic.volume)\
+            .filter(Comic.publisher == string)\
+            .group_by(Comic.series).all()
+    
     def recentlyAddedComics(self, limit = 10):
         return self.getSession().query(Comic)\
-                   .order_by(Comic.added_ts.desc())\
-                   .limit(limit)
+            .order_by(Comic.added_ts.desc())\
+            .limit(limit)
 
     def recentlyReadComics(self, limit = 10):
         return self.getSession().query(Comic)\
-                   .filter(Comic.lastread_ts != "")\
-                   .order_by(Comic.lastread_ts.desc())\
-                   .limit(limit)
+            .filter(Comic.lastread_ts != "")\
+            .order_by(Comic.lastread_ts.desc())\
+            .limit(limit)
 
     def getRoles(self):
         return self.getSession().query(Role).all()
@@ -610,6 +621,9 @@ class Library:
             for g in list(set(md.genre.split(","))):
                 genre = self.getNamedEntity(Genre,  g.strip())
                 comic.genres_raw.append(genre)
+
+        if md.publisher is not None:
+            comic.publishers_raw.append(md.publisher)
 
         if md.tags is not None:
             for gt in list(set(md.tags)):
@@ -792,6 +806,7 @@ class Library:
         query = query.options(subqueryload('teams_raw'))
         #query = query.options(subqueryload('credits_raw'))
         query = query.options(subqueryload('generictags_raw'))
+        query = query.options(subqueryload('publishers_raw'))
 
         return query.all(), total_results
 
@@ -885,7 +900,8 @@ class Library:
                                 | Comic.generictags_raw.any(GenericTag.name.ilike(keyphrase_filter))
                                 | Comic.locations_raw.any(Location.name.ilike(keyphrase_filter))
                                 | Comic.storyarcs_raw.any(StoryArc.name.ilike(keyphrase_filter))
-                                | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
+                                | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))                                
+                                | Comic.publishers_raw.any(Publisher.name.ilike(keyphrase_filter))
                             )
 
         def addQueryOnScalar(query, obj_prop, filt):
@@ -906,7 +922,6 @@ class Library:
         query = addQueryOnScalar(query, Comic.title, title_filter)
         query = addQueryOnScalar(query, Comic.path, path_filter)
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
-        query = addQueryOnScalar(query, Comic.publisher, publisher)
         query = addQueryOnScalar(query, Comic.language, language_filter)
         query = addQueryOnList(query, Comic.alternateseries_raw, AlternateSeries.name, alternateseries)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
@@ -915,6 +930,7 @@ class Library:
         query = addQueryOnList(query, Comic.locations_raw, Location.name, location)
         query = addQueryOnList(query, Comic.storyarcs_raw, StoryArc.name, storyarc)
         query = addQueryOnList(query, Comic.genres_raw, Genre.name, genre)
+        query = addQueryOnList(query, Comic.publishers_raw, Publisher.name, publisher)
 
         if hasValue(volume):
             try:

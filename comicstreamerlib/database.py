@@ -1,6 +1,6 @@
 #!/usr/bin/python
  
-from datetime import date,datetime
+from datetime import date, datetime
 import sqlalchemy
 import json
 import pprint 
@@ -143,6 +143,12 @@ comics_genres_table = Table('comics_genres', Base.metadata,
 )
 
 # Junction table
+comics_publishers_table = Table('comics_publishers', Base.metadata,
+     Column('comic_id', Integer, ForeignKey('comics.id')),
+     Column('publisher_id', Integer, ForeignKey('publisher.id'))
+)
+
+# Junction table
 comics_blacklist_table = Table('comics_blacklist', Base.metadata,
     Column('comic_id', Integer, ForeignKey('comics.id')),
     Column('blacklist_id', Integer, ForeignKey('blacklist.id')),
@@ -181,7 +187,6 @@ class Comic(Base):
         series = Column(String(1000))
         issue = Column(String(100))
         comments = Column(Text)
-        publisher = Column(String(256))
         title = Column(String(1000))
         imprint = Column(String(1000))
         weblink = Column(String(1000))
@@ -207,7 +212,8 @@ class Comic(Base):
                                     cascade="save-update,delete") #, backref='comics')
         genres_raw = relationship('Genre', secondary=comics_genres_table,
                                     cascade="save-update,delete") #, backref='comics')
-      
+        publisher_raw = relationship('Publisher', secondary=comics_publishers_table,
+                                    cascade="save-update,delete") #, backref='comics')
         blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
                                     cascade="save-update,delete") #, backref='comics')
 
@@ -245,6 +251,8 @@ class Comic(Base):
         generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
                                     cascade="save-update,delete") #, backref='comics')
         genres_raw = relationship('Genre', secondary=comics_genres_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        publisher_raw = relationship('Publisher', secondary=comics_publishers_table,
                                     cascade="save-update,delete") #, backref='comics')
         blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
                                     cascade="save-update,delete") #, backref='comics')
@@ -494,7 +502,21 @@ class Genre(Base):
         name = ColumnProperty(
                 Column('name', String, unique = True),
                 comparator_factory=MyComparator)
-
+        
+class Publisher(Base):
+    __tablename__ = "publishers"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    id = Column(Integer, primary_key=True)
+    global mysql_active
+    if mysql_active:
+        name = ColumnProperty(
+                Column('name', String(1000), unique = True),
+                comparator_factory=MyComparator)
+    else:
+        name = ColumnProperty(
+                Column('name', String, unique = True),
+                comparator_factory=MyComparator)
+        
 class DeletedComic(Base):
     __tablename__ = "deletedcomics"
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}

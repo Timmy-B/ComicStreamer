@@ -365,7 +365,7 @@ table {
 	position: relative;
 }
 
-body:not(.mobile) .navigate:hover {
+body:not(.mobile) .navigate:active {
 	opacity: 1;
 }
 
@@ -405,8 +405,7 @@ body:not(.mobile) .navigate:hover {
 
 #cb-progress-bar .progressbar-value {
 	width: 0;
-	background: #2D2D2D;
-	border-color: #BB86FC;
+	background: #BB86FC;
 	border-radius: 12px;
 }
 
@@ -459,7 +458,7 @@ label {
 }
 
 .toolbar {
-	color: white;
+	color: #BB86FC;
 	background-color: #2D2D2D;
 	/* background-image: linear-gradient(to bottom, #2D2D2D, rgb(17, 17, 17));*/
 	overflow: visible;
@@ -493,14 +492,14 @@ label {
 }
 
 .toolbar button {
-	color: white;
+	color: #BB86FC;
 	border: none;
 	background-color: transparent;
 	padding: 0;
 }
 
 .toolbar li>button {
-	font-size: 1.5em;
+	font-size: 1.8em;
 	padding: 0 12px;
 }
 
@@ -509,11 +508,11 @@ label {
 }
 
 .toolbar li>button:hover {
-	color: #BB86FC;
+	color: white;
 }
 
 .toolbar button[data-action=close]:hover {
-	color: #BB86FC;
+	color: white;
 }
 
 .toolbar .dropdown {
@@ -521,7 +520,7 @@ label {
 	position: absolute;
 	width: 212px;
 	background-color: #2d2d2d;
-	color: white;
+	color: #BB86FC;
 	border-radius: 4px;
 	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
 	top: 2em;
@@ -571,4 +570,8 @@ body:not(.mobile) .toolbar li:hover>.dropdown {
 
 #content{
 	background-color: #282828;
+}
+/* some magic CSS */
+#comic{
+	  image-rendering: auto;
 }

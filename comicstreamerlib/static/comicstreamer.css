@@ -71,6 +71,7 @@ ul.nav {
 #content {
     margin-top: 90px;
     padding: 20px;
+    background-color: #282828;
 }
 
 #main_search {
@@ -238,6 +239,7 @@ a {
     display: block;
     margin: 0px auto;
     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
 
 }
 
@@ -737,4 +739,91 @@ input:focus {
 
 .browser_list ul li a strong {
     margin-right: 10px;
+}
+
+.ncover_list {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+
+.coverContainer {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 90px;
+    height: 175px;
+    margin: 5px;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+.thumbContainer {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background-color: #000;
+    object-fit: contain;
+    height: 75%;
+    width: 90px;
+    vertical-align: middle;
+    box-shadow: 1px 1px 11px 0px #000;
+    border-radius: 5px;
+}
+
+.thumb {
+    object-fit: contain;
+    height: auto;
+    width: 90px;
+    max-width: 100%;
+    max-height: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    position: relative;
+}
+
+.thumb:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-image: url('/static/icons/publishers/Unknown Publisher.jpg');
+}
+
+.labelContainer {
+    display: flex;
+    height: 25%;
+    text-align: center;
+    width: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.label {
+    vertical-align: middle;
+    object-fit: contain;
+    bottom: 0;
+    font-size: .8em
+}
+
+.comicdetails_top, .cd_comments{
+    color: #BB86FC;
+
 }

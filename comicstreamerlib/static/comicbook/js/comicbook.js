@@ -2315,7 +2315,7 @@ var ComicBook = (function ($) {
      * @see #drawPage
      */
     ComicBook.prototype.drawNextPage = function () {
-
+ 
       var page;
 
       try {
@@ -2336,6 +2336,7 @@ var ComicBook = (function ($) {
 
       // make sure the top of the page is in view
       window.scroll(0, 0);
+      console.log(pointer)
     };
 
     /**
@@ -2354,7 +2355,7 @@ var ComicBook = (function ($) {
       if (!page) { return false; }
 
       is_double_page_spread = (page.width > page.height); // need to run double page check again here as we are going backwards
-
+  
       if (pointer > 0) {
         if (options.pageTurnCallback) {
           options.pageTurnCallback(pointer)
@@ -2362,7 +2363,7 @@ var ComicBook = (function ($) {
         pointer -= (options.displayMode === 'single' || is_double_page_spread) ? 1 : 2;
         self.drawPage();
       }
-
+      console.log(pointer)
       // make sure the top of the page is in view
       window.scroll(0, 0);
     };
@@ -2372,7 +2373,7 @@ var ComicBook = (function ($) {
     };
 
     ComicBook.prototype.contrast = function () {
-      self.enhance.brightness({ contrast: $(this).val() });
+      self.enhance.contrast({ contrast: $(this).val() });
     };
 
     ComicBook.prototype.sharpen = function () {

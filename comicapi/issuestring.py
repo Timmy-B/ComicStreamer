@@ -36,7 +36,6 @@ class IssueString:
 
         #  break up the issue number string into 2 parts: the numeric and suffix string.
         # ( assumes that the numeric portion is always first )
-
         self.num = None
         self.suffix = ""
 
@@ -50,7 +49,7 @@ class IssueString:
             return
 
         #skip the minus sign if it's first
-        if text[0] == '-':
+        if text[0] == '-' and len(text) > 1:
             start = 1
         else:
             start = 0

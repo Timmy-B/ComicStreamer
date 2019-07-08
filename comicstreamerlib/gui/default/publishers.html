@@ -1,0 +1,25 @@
+{% set title = "ComicStreamer" %}
+{% include head/main.html %}
+
+    <div class="ncover_list">
+        {% for item in publishers %}
+            {% block item %}
+            <div class="coverContainer">
+            <div class="thumbContainer">
+                <a href="/publisher/{{item.publisher}}" > <!-- target="_blank" -->
+                    <img class="thumb" src="/static/icons/publishers/{{item.publisher}}.jpg">
+                </a>
+            </div>
+                <div class="labelContainer">
+                <div class="label">{{item.publisher}}</div>
+                </div>
+            </div>
+            {% end %}
+        {% end %}
+    </div>
+
+{% include foot/foot.html %}
+
+
+
+
