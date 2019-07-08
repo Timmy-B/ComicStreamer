@@ -81,7 +81,6 @@ def alchemy_encoder():
                                                     and x != "issue_num" 
                                                     and x != "file" 
                                                     and x != "folder"
-                                                    and x != "thumbnail"
                                                     ]:
                     value = obj.__getattribute__(field)
                     if (isinstance(value, date)): 
@@ -145,7 +144,7 @@ comics_genres_table = Table('comics_genres', Base.metadata,
 # Junction table
 comics_publishers_table = Table('comics_publishers', Base.metadata,
      Column('comic_id', Integer, ForeignKey('comics.id')),
-     Column('publisher_id', Integer, ForeignKey('publisher.id'))
+     Column('publisher_id', Integer, ForeignKey('publishers.id'))
 )
 
 # Junction table
@@ -193,8 +192,6 @@ class Comic(Base):
         hash = Column(String(1000))
         language = Column(String(100))
         comicbookvine = Column(String(64))
-        #thumbnail = Column(LargeBinary(1024*1024*10*10))
-        thumbnail = deferred(Column(LargeBinary(1024*1024*3)))
         alternateIssue = Column(String(1000))
         alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
                                 cascade="save-update,delete") #, backref='comics')
@@ -232,7 +229,6 @@ class Comic(Base):
         weblink = Column(String)
         hash = Column(String)
         language = Column(String)
-        thumbnail = deferred(Column(LargeBinary))
         alternateIssue = Column(String)
         comicbookvine = Column(String)
         alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,

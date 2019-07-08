@@ -21,6 +21,7 @@ class AppFolders():
         make(AppFolders.appBlacklistPages())
         make(AppFolders.appCacheEbooks())
         make(AppFolders.appWebComic())
+        make(AppFolders.appThumbnails())
     
     @staticmethod
     def runningAtRoolLevel():
@@ -104,6 +105,14 @@ class AppFolders():
         return os.path.join(AppFolders.appData(), "webcomic")
 
     @staticmethod
+    def appThumbnails():
+        return os.path.join(AppFolders.appData(), "thumbnails")
+    
+    @staticmethod
+    def appThumbPath(filename):
+        return os.path.join(AppFolders.appData(), "thumbnails", filename)
+    
+    @staticmethod
     def appCachePages():
         return os.path.join(AppFolders.appData(), "cache", "pages")
 
@@ -114,7 +123,6 @@ class AppFolders():
     @staticmethod
     def appBlacklistPages():
         return os.path.join(AppFolders.appData(), "blacklist")
-
 
     @staticmethod
     def static():
@@ -132,3 +140,4 @@ class AppFolders():
     @staticmethod
     def iconsPath(filename):
         return os.path.join(AppFolders.appBase(), "static", "icons", filename)
+
