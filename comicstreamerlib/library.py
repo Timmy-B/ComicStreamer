@@ -423,13 +423,11 @@ class Library:
         #pass
         return self.getSession
 
-
-# this needs to be changed to laod the thumb from file - or removed completely and load from static
     def getComicThumbnail(self, comic_id):
         """Fast access to a comic thumbnail"""
-        # return self.getSession().query(Comic.thumbnail) \
-        #            .filter(Comic.id == int(comic_id)).scalar()
-        return ""
+        return self.getSession().query(Comic.thumbnail) \
+                   .filter(Comic.id == int(comic_id)).scalar()
+
     def getComic(self, comic_id):
         return self.getSession().query(Comic).get(int(comic_id))
     
@@ -550,6 +548,7 @@ class Library:
         comic.hash = md.hash
         comic.filesize = md.filesize
         comic.fingerprint = md.fingerprint
+        comic.thumbnail = md.thumbnail
 
         if not md.isEmpty:
             if md.series is not None:
@@ -580,8 +579,8 @@ class Library:
 
             if md.volume is not None:
                 comic.volume = int(md.volume)
-            # if md.publisher is not None:
-            #     comic.publisher = unicode(md.publisher)
+            if md.publisher is not None:
+                comic.publisher = unicode(md.publisher)
             if md.language is not None:
                 comic.language = unicode(md.language)
             if md.title is not None:
@@ -678,7 +677,7 @@ class Library:
             if style is not None:
                 md = ca.readMetadata(style)
                 if md.isEmpty:
-                    md = ca.metadataFromFilename()
+                     md = ca.metadataFromFilename()
             else:
                 # No metadata in comic.  make some guesses from the filename
                 md = ca.metadataFromFilename()
@@ -703,14 +702,11 @@ class Library:
             #now resize it
             thumb = StringIO.StringIO()
             
-            #Lets right thumbs to files. large libraries cause the database to bloat
             try:
                 utils.resize(image_data, (400, 400), thumb)
-                thumbNail=open(AppFolders.appThumbPath(md.fingerprint+".png"),"w+")
-                thumbNail.write(thumb)
-                thumbNail.close()
+                md.thumbnail = thumb.getvalue()
             except:
-                print("Thumbnail extraction failed")
+                md.thumbnail = None
             return md
         return None
 
@@ -1008,8 +1004,8 @@ class Library:
                 order_key = Comic.issue_num
             elif order == "date":
                 order_key = Comic.date
-            # elif order == "publisher":
-            #     order_key = Comic.publisher
+            elif order == "publisher":
+                order_key = Comic.publisher
             elif order == "language":
                 order_key = Comic.language
             elif order == "title":
