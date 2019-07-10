@@ -4,7 +4,7 @@
         <span class="comic_caption"><a href="{{handler.webroot}}/comiclist/browse?series={{random_comic.series}}">{{random_comic.series}}</a></span>
         
     <a href="{{handler.webroot}}/comic/{{random_comic.id}}/reader"> <!-- target="_blank" -->
-        <img class="random_comic" src="{{handler.webroot}}/comic/{{random_comic.id}}/thumbnail?api_key={{api_key}}">
+        <img class="random_comic" src="{{handler.webroot}}/comic/{{random_comic.fingerprint}}/thumbnail?api_key={{api_key}}">
         <span class="comic_caption"><a href="{{handler.webroot}}/comiclist/browse?series={{random_comic.series}}">#{{random_comic.issue}} {{random_caption}}</a></span>
     </a>
 </div>

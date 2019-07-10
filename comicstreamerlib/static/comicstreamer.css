@@ -827,3 +827,17 @@ input:focus {
     color: #BB86FC;
 
 }
+table.dataTable tbody tr {
+    color: lightgray;
+    background-color: #282828;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dataTables_info,
+.dataTables_length {
+    color: #BB86FC !important;
+}
+.tableThumb{
+    width:60px;
+    height:92px;
+}

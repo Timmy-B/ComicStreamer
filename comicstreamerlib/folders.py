@@ -6,7 +6,6 @@ import logging
 appname = 'ComicStreamer'
 
 from options import Options
-
 class AppFolders():
     
     @staticmethod
@@ -20,8 +19,8 @@ class AppFolders():
         make(AppFolders.appCachePages())
         make(AppFolders.appBlacklistPages())
         make(AppFolders.appCacheEbooks())
+        make(AppFolders.appThumbs())
         make(AppFolders.appWebComic())
-        make(AppFolders.appThumbnails())
     
     @staticmethod
     def runningAtRoolLevel():
@@ -105,12 +104,16 @@ class AppFolders():
         return os.path.join(AppFolders.appData(), "webcomic")
 
     @staticmethod
-    def appThumbnails():
+    def appThumbs():
         return os.path.join(AppFolders.appData(), "thumbnails")
     
     @staticmethod
-    def appThumbPath(filename):
-        return os.path.join(AppFolders.appData(), "thumbnails", filename)
+    def appThumbFolder(foldername):
+        return os.path.join(AppFolders.appData(), "thumbnails", foldername)
+
+    @staticmethod
+    def appThumbPath(foldername, filename):
+        return os.path.join(AppFolders.appData(), "thumbnails", foldername, filename)
     
     @staticmethod
     def appCachePages():
@@ -140,4 +143,4 @@ class AppFolders():
     @staticmethod
     def iconsPath(filename):
         return os.path.join(AppFolders.appBase(), "static", "icons", filename)
-
+    

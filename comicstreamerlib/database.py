@@ -1,5 +1,5 @@
 #!/usr/bin/python
- 
+
 from datetime import date, datetime
 import sqlalchemy
 import json
@@ -52,7 +52,7 @@ def resultSetToDict(rset, listname="aaData", total=None):
         results_dict['total_count'] = len(l)
     else:
         results_dict['total_count'] = total
-      
+    
     return results_dict
 
 
@@ -131,20 +131,14 @@ comics_alternateseries_table = Table('comics_alternateseries', Base.metadata,
 )
 # Junction table
 comics_generictags_table = Table('comics_generictags', Base.metadata,
-     Column('comic_id', Integer, ForeignKey('comics.id')),
-     Column('generictags_id', Integer, ForeignKey('generictags.id'))
+    Column('comic_id', Integer, ForeignKey('comics.id')),
+    Column('generictags_id', Integer, ForeignKey('generictags.id'))
 )
 
 # Junction table
 comics_genres_table = Table('comics_genres', Base.metadata,
-     Column('comic_id', Integer, ForeignKey('comics.id')),
-     Column('genre_id', Integer, ForeignKey('genres.id'))
-)
-
-# Junction table
-comics_publishers_table = Table('comics_publishers', Base.metadata,
-     Column('comic_id', Integer, ForeignKey('comics.id')),
-     Column('publisher_id', Integer, ForeignKey('publishers.id'))
+    Column('comic_id', Integer, ForeignKey('comics.id')),
+    Column('genre_id', Integer, ForeignKey('genres.id'))
 )
 
 # Junction table
@@ -157,8 +151,8 @@ comics_blacklist_table = Table('comics_blacklist', Base.metadata,
 """
 # Junction table
 readinglists_comics_table = Table('readinglists_comics', Base.metadata,
-     Column('comic_id', Integer, ForeignKey('comics.id')),
-     Column('readinglist_id', Integer, ForeignKey('readinglists.id'))
+    Column('comic_id', Integer, ForeignKey('comics.id')),
+    Column('readinglist_id', Integer, ForeignKey('readinglists.id'))
 )
 """
 
@@ -186,6 +180,7 @@ class Comic(Base):
         series = Column(String(1000))
         issue = Column(String(100))
         comments = Column(Text)
+        publisher = Column(String(256))
         title = Column(String(1000))
         imprint = Column(String(1000))
         weblink = Column(String(1000))
@@ -194,7 +189,7 @@ class Comic(Base):
         comicbookvine = Column(String(64))
         alternateIssue = Column(String(1000))
         alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
-                                cascade="save-update,delete") #, backref='comics')
+                                    cascade="save-update,delete") #, backref='comics')
         credits_raw = relationship('Credit', #secondary=credits_,
                                     cascade="all, delete", )#, backref='comics')
         characters_raw = relationship('Character', secondary=comics_characters_table,
@@ -208,8 +203,6 @@ class Comic(Base):
         generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
                                     cascade="save-update,delete") #, backref='comics')
         genres_raw = relationship('Genre', secondary=comics_genres_table,
-                                    cascade="save-update,delete") #, backref='comics')
-        publisher_raw = relationship('Publisher', secondary=comics_publishers_table,
                                     cascade="save-update,delete") #, backref='comics')
         blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
                                     cascade="save-update,delete") #, backref='comics')
@@ -233,7 +226,6 @@ class Comic(Base):
         comicbookvine = Column(String)
         alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
                                     cascade="save-update,delete") #, backref='comics')
-
         credits_raw = relationship('Credit', #secondary=credits_,
                                     cascade="all, delete", )#, backref='comics')
         characters_raw = relationship('Character', secondary=comics_characters_table,
@@ -248,8 +240,7 @@ class Comic(Base):
                                     cascade="save-update,delete") #, backref='comics')
         genres_raw = relationship('Genre', secondary=comics_genres_table,
                                     cascade="save-update,delete") #, backref='comics')
-        publisher_raw = relationship('Publisher', secondary=comics_publishers_table,
-                                    cascade="save-update,delete") #, backref='comics')
+
         blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
                                     cascade="save-update,delete") #, backref='comics')
   
@@ -499,20 +490,6 @@ class Genre(Base):
                 Column('name', String, unique = True),
                 comparator_factory=MyComparator)
         
-class Publisher(Base):
-    __tablename__ = "publishers"
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
-    id = Column(Integer, primary_key=True)
-    global mysql_active
-    if mysql_active:
-        name = ColumnProperty(
-                Column('name', String(1000), unique = True),
-                comparator_factory=MyComparator)
-    else:
-        name = ColumnProperty(
-                Column('name', String, unique = True),
-                comparator_factory=MyComparator)
-        
 class DeletedComic(Base):
     __tablename__ = "deletedcomics"
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
@@ -731,23 +708,23 @@ class DataManager():
                 raise SchemaVersionException
         results = session.query(DatabaseInfo).first()
         if results is None:
-           dbinfo = DatabaseInfo()
-           dbinfo.uuid = unicode(uuid.uuid4().hex)
-           dbinfo.last_updated = datetime.utcnow()
-           session.add(dbinfo)
-           session.commit()
-           logging.debug("Database: Added new uuid".format(dbinfo.uuid))
+            dbinfo = DatabaseInfo()
+            dbinfo.uuid = unicode(uuid.uuid4().hex)
+            dbinfo.last_updated = datetime.utcnow()
+            session.add(dbinfo)
+            session.commit()
+            logging.debug("Database: Added new uuid".format(dbinfo.uuid))
 
         """
         # Eventually, there will be multi-user support, but for now,
         # just have a single user entry
         results = session.query(User).first()
         if results is None:
-           user = User()
-           user.name = ""
-           user.password_digest = utils.getDigest("")
-           session.add(user)
-           session.commit()
+            user = User()
+            user.name = ""
+            user.password_digest = utils.getDigest("")
+            session.add(user)
+            session.commit()
         """
         session.close()
 
@@ -756,4 +733,4 @@ if __name__ == "__main__":
     dm.create()
 
 
-   
+

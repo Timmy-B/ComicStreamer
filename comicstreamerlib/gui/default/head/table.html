@@ -1,216 +1,123 @@
 <script type="text/javascript" charset="utf-8">
+    function populateComicDetails(cd, comic) {
 
-function populateComicDetails(cd, comic)
-{
-    
-    var thumb_url = '{{handler.webroot}}/comic/'+ comic.id +'/thumbnail?api_key={{api_key}}';
-    var reader_url = '{{handler.webroot}}/comic/'+ comic.id +'/reader?api_key={{api_key}}';
-    var download_url = '{{handler.webroot}}/comic/'+ comic.id +'/file?api_key={{api_key}}';
-    var json_url = '{{handler.webroot}}/comic/'+ comic.id +'?api_key={{api_key}}';
-    
-    $(cd).find(".cd_thumbnail").attr('src', thumb_url);
-    $(cd).find(".cd_reader_link").attr('href', reader_url);
-    
-    //$(cd).find(".cd_file_link").text(comic.path);
-    $(cd).find(".cd_path").text(comic.path);
-    
-    $(cd).find(".cd_file_link").attr('href', download_url);
-    $(cd).find(".cd_json_link").attr('href', json_url);
-    
-    str = '<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + comic.series + '</a>';
-    
-    // alternateserie should not be a sub table.... (alas poor me)
-    
-    if (comic.hasOwnProperty("alternateseries") && comic.alternateseries.length != 0) {
-        var alternateseries = comic.alternateseries.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item + '</a>'; } );
-        str = str + ' (' + alternateseries.join(", ") + ')'
-    }
-    
-    if (comic.issue !== "") {
-        str = str + ' #' + comic.issue;
-    }
-    
-    $(cd).find(".cd_issue").html( str);
-    
-    if (comic.year !== "") {
-        str = comic.year.toString();
-        if (comic.month !== "") {
-            month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            str = month_names[comic.month-1] + " " + str;
+        var thumb_url = '{{handler.webroot}}/comic/' + comic.fingerprint + '/thumbnail?api_key={{api_key}}';
+        var reader_url = '{{handler.webroot}}/comic/' + comic.id + '/reader?api_key={{api_key}}';
+        var download_url = '{{handler.webroot}}/comic/' + comic.id + '/file?api_key={{api_key}}';
+        var json_url = '{{handler.webroot}}/comic/' + comic.id + '?api_key={{api_key}}';
+
+        $(cd).find(".cd_thumbnail").attr('src', thumb_url);
+        $(cd).find(".cd_reader_link").attr('href', reader_url);
+
+        //$(cd).find(".cd_file_link").text(comic.path);
+        $(cd).find(".cd_path").text(comic.path);
+
+        $(cd).find(".cd_file_link").attr('href', download_url);
+        $(cd).find(".cd_json_link").attr('href', json_url);
+
+        str = '<a href="{{handler.webroot}}/comiclist/browse?series=' + comic.series + '">' + comic.series + '</a>';
+
+        // alternateserie should not be a sub table.... (alas poor me)
+
+        if (comic.hasOwnProperty("alternateseries") && comic.alternateseries.length != 0) {
+            var alternateseries = comic.alternateseries.map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item +
+                    '</a>';
+            });
+            str = str + ' (' + alternateseries.join(", ") + ')'
         }
-        
-        str = '(' + str + ')'
-        $(cd).find(".cd_date").text(str);
-    }
-    
-    if (comic.title !== "") {
-        str = '"' + comic.title + '"';
-        $(cd).find(".cd_title").text(str);
-    }
-    
-    
-    if (comic.volume !== "") {
-        str = "vol. " + comic.volume.toString() + ", ";
-        $(cd).find(".cd_volume").text(str);
-    }
-    
-    $(cd).find(".cd_publisher").html('<a href="{{handler.webroot}}/entities/browse/publishers/'+ comic.publisher +'">'+ comic.publisher +'</a>');
-    
-    
-    if (comic.language !== "") {
-        $(cd).find(".cd_language").text('['+comic.language+']');
-    }
-    else {
-        $(cd).find(".cd_language").text("");
-    }
-    
-    
-    $(cd).find(".cd_pagecount").text("[" + comic.page_count + " pages]") ;
-    
-    comments = comic.comments
-    if (comments != null && comments.length > 1000)
-    {
-        comments = comments.substring(0,1000) + "..."
-    }
-    
-    $(cd).find(".cd_comments").text(comments);
-    
-    for (var property in comic.credits) {
-        var credits = comic.credits[property].map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?credit=' + item + '">' + item + '</a>'; } );
-        $(cd).find('.cd_credits').append('<tr><td>' + property + '</td><td>' + credits.join(", ") + '</td></tr>');
-    }
-    
-    if (comic.hasOwnProperty("characters") && comic.characters.length != 0) {
-        var characters = comic.characters.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?character=' + item + '">' + item + '</a>'; } );
-        $(cd).find('.cd_lists').append('<tr><td>Characters</td><td>' + characters.join(", ") + '</td></tr>');
-    }
-    if (comic.hasOwnProperty("teams") && comic.teams.length != 0) {
-        var teams = comic.teams.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?team=' + item + '">' + item + '</a>'; } );
-        $(cd).find('.cd_lists').append('<tr><td>Teams</td><td>' + teams.join(", ") + '</td></tr>');
-    }
-    if (comic.hasOwnProperty("locations") && comic.locations.length != 0) {
-        var locations = comic.locations.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?location=' + item + '">' + item + '</a>'; } );
-        $(cd).find('.cd_lists').append('<tr><td>Locations</td><td>' + locations.join(", ") + '</td></tr>');
-    }
-    if (comic.hasOwnProperty("storyarcs") && comic.storyarcs.length != 0) {
-        var storyarcs = comic.storyarcs.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?storyarc=' + item + '">' + item + '</a>'; } );
-        $(cd).find('.cd_lists').append('<tr><td>Story Arcs</td><td>' + storyarcs.join(", ") + '</td></tr>');
-    }
-    if (comic.hasOwnProperty("tags") && comic.tags.length != 0) {
-        var tags = comic.tags.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?tag=' + item + '">' + item + '</a>'; } );
-        $(cd).find('.cd_lists').append('<tr><td>Tags</td><td>' + tags.join(", ") + '</td></tr>');
-    }
-    return cd;
-}
 
-function myAttributeWriter(record)
-{
-    var val = record[this.id];
-    if (this.id == 'thumb_url')
-    {
-        
-        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}"/></a>';
-    }
-
-    if (this.id == 'series')
-    {
-
-        val = '<a href="{{handler.webroot}}/comiclist/browse?series='+ record.series +'">'+ record.series +'</a>';
-          
-        if (record.hasOwnProperty("alternateseries") && record.alternateseries.length != 0) {
-
-            var alternateseries = record.alternateseries.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item + '</a>'; } );
-            val  = val + ' (' + alternateseries.join(", ") + ')'
+        if (comic.issue !== "") {
+            str = str + ' #' + comic.issue;
         }
-    }
 
-    if (this.id == 'publisher')
-    {
+        $(cd).find(".cd_issue").html(str);
 
-        val = '<a href="{{handler.webroot}}/comiclist/browse?publisher='+ record.publisher +'">'+ record.publisher +'</a>';
-    }
+        if (comic.year !== "") {
+            str = comic.year.toString();
+            if (comic.month !== "") {
+                month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                str = month_names[comic.month - 1] + " " + str;
+            }
 
-
-    if (this.id == 'language')
-    {
-
-        val = '<a href="{{handler.webroot}}/comiclist/browse?language='+ record.language +'">'+ record.language +'</a>';
-    }
-    
-    if (this.id == 'datex')
-    {
-        if (record['day'] != "" && record['month'] != "" && record['year'] != "")
-        {
-            val = record['day'] + '/' + record['month'] + '/' + record['year'];
-        } else if (record['month'] != "" && record['year'] != "")
-        {
-            val = record['month'] + '/' + record['year'];
+            str = '(' + str + ')'
+            $(cd).find(".cd_date").text(str);
         }
-        else if (record['year'] != "")
-        {
-            val = record['year'];
+
+        if (comic.title !== "") {
+            str = '"' + comic.title + '"';
+            $(cd).find(".cd_title").text(str);
         }
-        else
-        {
-            val = "";
+
+
+        if (comic.volume !== "") {
+            str = "vol. " + comic.volume.toString() + ", ";
+            $(cd).find(".cd_volume").text(str);
         }
+
+        $(cd).find(".cd_publisher").html('<a href="{{handler.webroot}}/entities/browse/publishers/' + comic.publisher +
+            '">' + comic.publisher + '</a>');
+
+
+        if (comic.language !== "") {
+            $(cd).find(".cd_language").text('[' + comic.language + ']');
+        } else {
+            $(cd).find(".cd_language").text("");
+        }
+
+
+        $(cd).find(".cd_pagecount").text("[" + comic.page_count + " pages]");
+
+        comments = comic.comments
+        if (comments != null && comments.length > 1000) {
+            comments = comments.substring(0, 1000) + "..."
+        }
+
+        $(cd).find(".cd_comments").text(comments);
+
+        for (var property in comic.credits) {
+            var credits = comic.credits[property].map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?credit=' + item + '">' + item + '</a>';
+            });
+            $(cd).find('.cd_credits').append('<tr><td>' + property + '</td><td>' + credits.join(", ") + '</td></tr>');
+        }
+
+        if (comic.hasOwnProperty("characters") && comic.characters.length != 0) {
+            var characters = comic.characters.map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?character=' + item + '">' + item + '</a>';
+            });
+            $(cd).find('.cd_lists').append('<tr><td>Characters</td><td>' + characters.join(", ") + '</td></tr>');
+        }
+        if (comic.hasOwnProperty("teams") && comic.teams.length != 0) {
+            var teams = comic.teams.map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?team=' + item + '">' + item + '</a>';
+            });
+            $(cd).find('.cd_lists').append('<tr><td>Teams</td><td>' + teams.join(", ") + '</td></tr>');
+        }
+        if (comic.hasOwnProperty("locations") && comic.locations.length != 0) {
+            var locations = comic.locations.map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?location=' + item + '">' + item + '</a>';
+            });
+            $(cd).find('.cd_lists').append('<tr><td>Locations</td><td>' + locations.join(", ") + '</td></tr>');
+        }
+        if (comic.hasOwnProperty("storyarcs") && comic.storyarcs.length != 0) {
+            var storyarcs = comic.storyarcs.map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?storyarc=' + item + '">' + item + '</a>';
+            });
+            $(cd).find('.cd_lists').append('<tr><td>Story Arcs</td><td>' + storyarcs.join(", ") + '</td></tr>');
+        }
+        if (comic.hasOwnProperty("tags") && comic.tags.length != 0) {
+            var tags = comic.tags.map(function (item) {
+                return '<a href="{{handler.webroot}}/comiclist/browse?tag=' + item + '">' + item + '</a>';
+            });
+            $(cd).find('.cd_lists').append('<tr><td>Tags</td><td>' + tags.join(", ") + '</td></tr>');
+        }
+        return cd;
     }
-    
-    return val;
-}
 
 
-function myAttributeWriter2(record)
+function popUpToolTip(comic)
 {
-    if (this.id == 'thumb_url_big')
-    {
-        
-        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}"/></a>';
-    }
-    return val;
-}
-
-function myRowWriter(rowIndex, record, columns, cellWriter)
-{
-    var tr = '';
-    
-    // grab the record's attribute for each column
-    for (var i = 0, len = columns.length; i < len; i++)
-    {
-        tr += cellWriter(columns[i], record);
-    }
-    
-    // add a special id with the comic ID for lookup later on
-    rowstr =  '<tr id="comic'+ record.id +'">' + tr + '</tr>';
-
-    //debugger;
-    return rowstr;
-}
-
-function ulWriter(rowIndex, record, columns, cellWriter) {
-  var cssClass = "thumb_url_big", li;
-//  if (rowIndex % 3 === 0) { cssClass += ' first'; }
-  li = '<li class="' + cssClass + '"><div class="caption"><a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}"/></a></div></li>';
-  return li;
-}
-
-// Function that creates our records from the DOM when the page is loaded
-function ulReader(index, li, record) {
-//  var $li = $(li),
-//      $caption = $li.find('.caption');
-//  record.id = $caption.html();
-}
-
-function addToolTips(rows)
-{
-    
-    var dynatable = $("#resultset").data("dynatable")
-
-    var comics = dynatable.settings.dataset.records
-    
-    for(var i=0, len=comics.length; i < len; i++)
-    {
-        comic = comics[i];
         row = $('#comic'+comic.id)
         
         // setup tooltip HTML
@@ -222,12 +129,19 @@ function addToolTips(rows)
         //grab the html text
         popup_text = $(cd).html()
         
-        row.qtip( {
-                 show: 'click',
+        $(this).qtip( {
+                 show: {ready: true},
+                 overwrite: true,
                  hide:
                  {
                  event: 'unfocus',
                  },
+      events: {
+        hidden: function(event, api) {
+          // Destroy it immediately
+          api.destroy(true);
+        }
+      },
                  content: {
                  text: popup_text,
                  button: 'Close'
@@ -252,110 +166,70 @@ function addToolTips(rows)
                  });
                  
     }
-}
 
 
-function setupTable()
-{
-    if (location.search.length > 0)
-    {
-        args = location.search  + '&api_key={{api_key}}';
-    }
-    else
-    {
-        args = location.search  + '?api_key={{api_key}}';
-    }
-    var table_init =
-    {
-        features:
-        {
-            paginate: true,
-            search: true
-        },
-        dataset:
-        {
-            ajax: true,
-            ajaxUrl: '{{src}}'+ args,
-            ajaxOnLoad: true,
-            records: [],
-            //ajaxCache: null,
-            //ajaxMethod: 'GET',
-            perPageDefault: 50,
-            perPageOptions: [10,20,50,100,200],
-            
-        },
-        params:
-        {
-            //queries: 'queries',
-            //sorts: 'order',
-            perPage: 'per_page',
-            records: 'comics',
-            queryRecordCount: 'total_count',
-            totalRecordCount: 'page_count'
-        },
-        writers:
-        {
-            _rowWriter: myRowWriter,
-            _attributeWriter: myAttributeWriter
-        },
+
+
+
+
+    function renderTable(){
+
+
     }
 
-    var table_big_init =
-    {
-        table: {
-            bodyRowSelector: 'li'
-        },
-        features:
-        {
-            paginate: true,
-            search: true
-        },
-
-        dataset:
-        {
-            ajax: true,
-            ajaxUrl: '{{src}}'+ args,
-            ajaxOnLoad: true,
-            records: [],
-            //ajaxCache: null,
-            //ajaxMethod: 'GET',
-            perPageDefault: 50,
-            perPageOptions: [10,20,50,100,200],
-            
-        },
-        params:
-        {
-            //queries: 'queries',
-            //sorts: 'order',
-            perPage: 'per_page',
-            records: 'comics',
-            queryRecordCount: 'total_count',
-            totalRecordCount: 'page_count'
-        },
-        writers: {
-            _rowWriter: ulWriter,
-            _attributeWriter: myAttributeWriter2
-        },
-        readers: {
-            _rowReader: ulReader
-        },
+    function imgURL(data){
+        var url = '<img class="tableThumb" src="{{handler.webroot}}/comic/'+data+'/thumbnail?api_key={{api_key}}" loading="lazy">';
+        return url
     }
 
-    $('#resultset_big').dynatable( table_big_init);
-    $('#resultset_big').bind('dynatable:afterUpdate', addToolTips);
-    $('#resultset').dynatable( table_init);
-    $('#resultset').bind('dynatable:afterUpdate', addToolTips);
-    
-}
+    $(document).ready(function() {
+    var table;
+        if (location.search.length > 0) {
+            args = location.search + '&api_key={{api_key}}';
+        } else {
+            args = location.search + '?api_key={{api_key}}';
+        }
+        
+        $.getJSON("{{src}}" + args, function (result) {
+        table = $('#resultset').DataTable({
+        "data": result.comics,
+        "columns": [
+        { "data": "fingerprint" },
+        { "data": "series" },
+        { "data": "title" },
+        { "data": "issue" },
+        { "data": "volume" },
+        { "data": "date" },
+        { "data": "publisher" },
+        ],
+        columnDefs:[{targets:5, render:function(data){
+            return moment(data).format('MM/YYYY');
+        }},{
+        targets : 0 ,
+        "width": "42px",
+        "searchable": false,
+        "orderable": false,
+        "data": "img",
+        "render" : function (data, type, row, meta) {
+        return imgURL(data)}}],
 
-$(document).ready(
-                  function()
-                  {
-                  setupTable();
-                  }
-                  );
+        "order": [[ 3, "asc" ]],
+
+        })
+            })
+
+        $('#resultset tbody').on('click', 'tr', function () {
+        var data = table.row( this ).data();
+        popUpToolTip(data)
+        //window.location.href = '{{handler.webroot}}/comic/'+data.id+'/reader?api_key={{api_key}}';
+    } );
+    })
+
+
 </script>
-    </head>
-    <body>
-{% include menu/browser.html %}
-        <div id=content>
+</head>
+
+<body>
+    {% include menu/browser.html %}
+    <div id=content>
+        

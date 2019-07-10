@@ -164,10 +164,12 @@ class JSONResultAPIHandler(GenericAPIHandler):
         alternateseries = self.get_argument(u"alternateseries", default=None)
         volume = self.get_argument(u"volume", default=None)
         publisher = self.get_argument(u"publisher", default=None)
+        imprint = self.get_argument(u"imprint", default=None)
         language = self.get_argument(u"language", default=None)
         credit_filter = self.get_argument(u"credit", default=None)
         tag = self.get_argument(u"tag", default=None)
         genre = self.get_argument(u"genre", default=None)
+        fingerprint = self.get_argument(u"fingerprint", default=None)
 
 
         if folder_filter != "":
@@ -195,7 +197,6 @@ class JSONResultAPIHandler(GenericAPIHandler):
             query = query.filter( Comic.series.ilike(keyphrase_filter)
                                 | Comic.alternateseries_raw.any(AlternateSeries.name.ilike(keyphrase_filter))
                                 | Comic.title.ilike(keyphrase_filter)
-                                | Comic.publisher.ilike(keyphrase_filter)
                                 | Comic.language.ilike(keyphrase_filter)
                                 | Comic.path.ilike(keyphrase_filter)
                                 | Comic.comments.ilike(keyphrase_filter)
@@ -224,7 +225,6 @@ class JSONResultAPIHandler(GenericAPIHandler):
         query = addQueryOnScalar(query, Comic.title, title_filter)
         query = addQueryOnScalar(query, Comic.path, path_filter)
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
-        query = addQueryOnScalar(query, Comic.publisher, publisher)
         query = addQueryOnScalar(query, Comic.language, language)
         query = addQueryOnList(query, Comic.alternateseries_raw, AlternateSeries.name, alternateseries)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
@@ -330,7 +330,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
                 order_key = Comic.publisher
             elif order == "language":
                 order_key = Comic.language
-	    elif order == "title":
+            elif order == "title":
                 order_key = Comic.title
             elif order == "path":
                 order_key = Comic.path
@@ -597,9 +597,20 @@ class ComicPageAPIHandler(ImageAPIHandler):
         self.write(image_data)
 
 class ThumbnailAPIHandler(ImageAPIHandler):
-    def get(self, comic_id):
+    def get(self, comic_fingerprint):
         self.validateAPIKey()
-        thumbnail = self.library.getComicThumbnail(comic_id)
+        # thumbnail = self.library.getComicThumbnail(comic_fingerprint)
+        
+        filename = comic_fingerprint+".png"
+        print "getting :" + filename
+        foldername = filename[0]
+        thumbSubFolder = AppFolders.appThumbFolder(foldername)
+        if not os.path.exists(thumbSubFolder):
+            os.makedirs(thumbSubFolder)
+        folderpath = AppFolders.appThumbPath(foldername, filename)
+        with open(folderpath, 'rb') as fd:
+            thumbnail = fd.read()
+
         self.setContentType('image/jpg')
         
         if thumbnail != None:
@@ -725,7 +736,6 @@ class EntityAPIHandler(JSONResultAPIHandler):
                     'characters' : Character.name,
                     'persons' : Person.name,
                     'language' : Comic.language,
-                    'publishers' : Comic.publisher,
                     'roles' : Role.name,
                     'series': Comic.series,
                     'volumes' : Comic.volume,
@@ -800,6 +810,7 @@ class EntityAPIHandler(JSONResultAPIHandler):
                 query = query.options(subqueryload('characters_raw'))
                 query = query.options(subqueryload('storyarcs_raw'))
                 query = query.options(subqueryload('alternateseries_raw'))
+                query = query.options(subqueryload('publishers_raw'))
                 query = query.options(subqueryload('locations_raw'))
                 query = query.options(subqueryload('teams_raw'))
                 #query = query.options(subqueryload('credits_raw'))                
@@ -865,7 +876,6 @@ class EntityAPIHandler(JSONResultAPIHandler):
                 query = query.join(comics_storyarcs_table).join(StoryArc)
             if e == 'alternateseries':
                 query = query.join(comics_alternateseries_table).join(AlternateSeries)
-
             if e == 'genres':
                 query = query.join(comics_genres_table).join(Genre)
             if e == 'locations':
@@ -934,7 +944,7 @@ class MainHandler(BaseHandler):
         random_comic = self.library.randomComic()
 
         if random_comic is None:
-            random_comic = type('fakecomic', (object,),{'id':0, '':'No Comics', 'issue':'', 'series':'','title':''})()
+            random_comic = type('fakecomic', (object,),{'id':0, '':'No Comics', 'issue':'', 'series':'','title':'','fingerprint':''})()
         
         caption = u""
         if random_comic.issue is not None:
@@ -1050,7 +1060,7 @@ class LogPageHandler(BaseHandler):
 
         self.render(deviceroot(self)+"log.html",
                     logtxt=logtxt)
-     
+
 class ConfigPageHandler(BaseHandler):
     fakepass = "T01let$tRe@meR"
 
@@ -1236,7 +1246,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['ebook_cache_location'] = self.get_argument(u"ebook_cache_location", default="")
         formdata['ebook_cache_free'] = self.get_argument(u"ebook_cache_free", default="")
         formdata['ebook_cache_size'] = self.get_argument(u"ebook_cache_size", default="")
-       
+
         failure_str = ""
         success_str = ""
         failure_strs = list()
@@ -1272,7 +1282,7 @@ class ConfigPageHandler(BaseHandler):
         if not formdata['port'].isdigit():
             port_failed = True
             failure_strs.append(u"Non-numeric port value: {0}".format(formdata['port']))
-              
+            
         #validate port range
         if not port_failed:  
             new_port = int(formdata['port'])
@@ -1287,7 +1297,7 @@ class ConfigPageHandler(BaseHandler):
                 if new_port != old_port and not self.is_port_available(new_port):
                     failure_strs.append(u"Port not available: {0}".format(new_port))
                     port_failed = True
-          
+        
         #validate password and username are set
         if formdata['use_authentication'] and (formdata['username']=="" or formdata['password']==""):
             failure_strs.append(u"Username and password must be filled in if the 'use authentication' box is checked")
@@ -1587,17 +1597,22 @@ class APIServer(tornado.web.Application):
         #    sys.exit(-1)
 
 
-        if not os.path.exists(AppFolders.appCachePages()):
-            os.makedirs(AppFolders.appCachePages())
+        # if not os.path.exists(AppFolders.appCachePages()):
+        #     os.makedirs(AppFolders.appCachePages())
     
-        if not os.path.exists(AppFolders.appCacheEbooks()):
-            os.makedirs(AppFolders.appCacheEbooks())
+        # if not os.path.exists(AppFolders.appCacheEbooks()):
+        #     os.makedirs(AppFolders.appCacheEbooks())
 
-        if not os.path.exists(AppFolders.appBlacklistPages()):
-            os.makedirs(AppFolders.appBlacklistPages())
+        # if not os.path.exists(AppFolders.appBlacklistPages()):
+        #     os.makedirs(AppFolders.appBlacklistPages())
 
-        if not os.path.exists(AppFolders.appWebComic()):
-            os.makedirs(AppFolders.appWebComic())
+        # if not os.path.exists(AppFolders.appWebComic()):
+        #     os.makedirs(AppFolders.appWebComic())
+
+        # if not os.path.exists(AppFolders.appThumbs()):
+        #     os.makedirs(AppFolders.appThumbs())
+
+        AppFolders.makeFolders()
 
         #self.dm = DataManager()
         self.dm = DataManager(config)
@@ -1721,7 +1736,7 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/like", ComicFavoritesAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/cache", ComicBlacklistAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+)", ComicPageAPIHandler ),
-            (self.webroot + r"/comic/([0-9]+)/thumbnail", ThumbnailAPIHandler),
+            (self.webroot + r"/comic/([a-zA-Z\-0-9]+)/thumbnail", ThumbnailAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/file", FileAPIHandler),
             (self.webroot + r"/entities(/.*)*", EntityAPIHandler),
             (self.webroot + r"/folders(/.*)*", FolderAPIHandler),
@@ -1852,7 +1867,7 @@ class APIServer(tornado.web.Application):
             log_method = logging.error
         request_time = 1000.0 * handler.request.request_time()
         log_method("%d %s %.2fms", handler.get_status(),
-                   handler._request_summary(), request_time)
+                    handler._request_summary(), request_time)
         
     def run(self):
         tornado.ioloop.IOLoop.instance().start()

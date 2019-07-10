@@ -1,14 +1,17 @@
 {% include base/head.html %}
 
 <style type="text/css" title="currentStyle">
+    @import "{{ static_url('datatables/datatables.min.css') }}";
+    @import "{{ static_url('dynatable/jquery.dynatable.css') }}";
     @import "{{ static_url('dynatable/jquery.dynatable.css') }}";
     @import "{{ static_url('qtip2/jquery.qtip.css') }}";
     @import "{{ static_url('comicstreamer.css') }}";
 </style>
 
 <script type="text/javascript" language="javascript" src="{{ static_url('js/jquery-2.0.2.min.js') }}"></script>
+<script type="text/javascript" language="javascript" src="{{ static_url('js/moment.js') }}"></script>
 
-<script type="text/javascript" src="{{ static_url('dynatable/jquery.dynatable.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('datatables/datatables.min.js') }}"></script>
 <script src="{{ static_url('qtip2/jquery.qtip.js') }}"></script>
 
 

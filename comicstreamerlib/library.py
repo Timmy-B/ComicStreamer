@@ -24,7 +24,7 @@ from sqlalchemy.sql import label
 import shutil
 import utils
 from database import Comic, Blacklist, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
-    StoryArc, Genre, DeletedComic, AlternateSeries, Publisher
+    StoryArc, Genre, DeletedComic, AlternateSeries
 from folders import AppFolders
 from sqlalchemy.orm import load_only
 
@@ -424,18 +424,24 @@ class Library:
         return self.getSession
 
 
-# this needs to be changed to laod the thumb from file - or removed completely and load from static
-    def getComicThumbnail(self, comic_id):
-        """Fast access to a comic thumbnail"""
-        # return self.getSession().query(Comic.thumbnail) \
-        #            .filter(Comic.id == int(comic_id)).scalar()
-        return ""
+
+    def getComicThumbnail(self, comic_fingerprint):
+        
+                filename = comic_fingerprint+".png"
+                foldername = filename[0]
+                folderpath = AppFolders.appThumbPath(foldername, filename)
+                with open(folderpath, 'rb') as fd:
+                    thumbnail = fd.read()
+                    self.write(thumbnail.getvalue())
+
+                
+                
     def getComic(self, comic_id):
         return self.getSession().query(Comic).get(int(comic_id))
     
     def getComicPage(self, comic_id, page_number, cache = True, max_height = None):
         (path, page_count) = self.getSession().query(Comic.path, Comic.page_count) \
-                                 .filter(Comic.id == int(comic_id)).first()
+                                .filter(Comic.id == int(comic_id)).first()
 
         image_data = None
         default_img_file = AppFolders.missingPath("page.png")
@@ -483,13 +489,13 @@ class Library:
         return self.getSession().query(Comic.id, Comic.path, Comic.mod_ts).all()
         
     def publishers(self):
-        return self.getSession().query(Comic.publisher).group_by(Comic.publisher).all()
+        return self.getSession().query(Comic.publisher, Comic.imprint).group_by(Comic.publisher).all()
     
     def seriesByPublisher(self, string = ''):
         print "lets get: " + string
-        return self.getSession().query(Comic.series, func.min(Comic.issue).label("issue"), Comic.id, Comic.publisher, Comic.volume)\
+        return self.getSession().query(Comic.series, func.min(Comic.issue).label("issue"), Comic.id, Comic.fingerprint, Comic.publisher, Comic.volume)\
             .filter(Comic.publisher == string)\
-            .group_by(Comic.series).all()
+            .group_by(Comic.series).order_by(Comic.series).all()
     
     def recentlyAddedComics(self, limit = 10):
         return self.getSession().query(Comic)\
@@ -580,8 +586,8 @@ class Library:
 
             if md.volume is not None:
                 comic.volume = int(md.volume)
-            # if md.publisher is not None:
-            #     comic.publisher = unicode(md.publisher)
+            if md.publisher is not None:
+                comic.publisher = unicode(md.publisher)
             if md.language is not None:
                 comic.language = unicode(md.language)
             if md.title is not None:
@@ -622,9 +628,6 @@ class Library:
             for g in list(set(md.genre.split(","))):
                 genre = self.getNamedEntity(Genre,  g.strip())
                 comic.genres_raw.append(genre)
-
-        if md.publisher is not None:
-            comic.publishers_raw.append(md.publisher)
 
         if md.tags is not None:
             for gt in list(set(md.tags)):
@@ -706,11 +709,20 @@ class Library:
             #Lets right thumbs to files. large libraries cause the database to bloat
             try:
                 utils.resize(image_data, (400, 400), thumb)
-                thumbNail=open(AppFolders.appThumbPath(md.fingerprint+".png"),"w+")
-                thumbNail.write(thumb)
-                thumbNail.close()
+                filename = md.fingerprint+".png"
+                foldername = filename[0]
+                thumbSubFolder = AppFolders.appThumbFolder(foldername)
+                if not os.path.exists(thumbSubFolder):
+                    os.makedirs(thumbSubFolder)
+                folderpath = AppFolders.appThumbPath(foldername, filename)
+                with open(folderpath, 'wb') as f:
+                    f.write(thumb.getvalue())
+
+                print("Extracted thumb: "+filename)
+
             except:
                 print("Thumbnail extraction failed")
+            # print md
             return md
         return None
 
@@ -810,7 +822,6 @@ class Library:
         query = query.options(subqueryload('teams_raw'))
         #query = query.options(subqueryload('credits_raw'))
         query = query.options(subqueryload('generictags_raw'))
-        query = query.options(subqueryload('publishers_raw'))
 
         return query.all(), total_results
 
@@ -895,17 +906,16 @@ class Library:
             query = query.filter( Comic.series.ilike(keyphrase_filter)
                                 | Comic.alternateseries_raw.any(AlternateSeries.name.ilike(keyphrase_filter))
                                 | Comic.title.ilike(keyphrase_filter)
-                                | Comic.publisher.ilike(keyphrase_filter)
                                 | Comic.language.ilike(keyphrase_filter)
                                 | Comic.path.ilike(keyphrase_filter)
                                 | Comic.comments.ilike(keyphrase_filter)
+                                | Comic.publisher.ilike(keyphrase_filter)
                                 | Comic.characters_raw.any(Character.name.ilike(keyphrase_filter))
                                 | Comic.teams_raw.any(Team.name.ilike(keyphrase_filter))
                                 | Comic.generictags_raw.any(GenericTag.name.ilike(keyphrase_filter))
                                 | Comic.locations_raw.any(Location.name.ilike(keyphrase_filter))
                                 | Comic.storyarcs_raw.any(StoryArc.name.ilike(keyphrase_filter))
-                                | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))                                
-                                | Comic.publishers_raw.any(Publisher.name.ilike(keyphrase_filter))
+                                | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
                             )
 
         def addQueryOnScalar(query, obj_prop, filt):
@@ -926,6 +936,7 @@ class Library:
         query = addQueryOnScalar(query, Comic.title, title_filter)
         query = addQueryOnScalar(query, Comic.path, path_filter)
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
+        query = addQueryOnScalar(query, Comic.publisher, publisher)
         query = addQueryOnScalar(query, Comic.language, language_filter)
         query = addQueryOnList(query, Comic.alternateseries_raw, AlternateSeries.name, alternateseries)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
@@ -934,7 +945,6 @@ class Library:
         query = addQueryOnList(query, Comic.locations_raw, Location.name, location)
         query = addQueryOnList(query, Comic.storyarcs_raw, StoryArc.name, storyarc)
         query = addQueryOnList(query, Comic.genres_raw, Genre.name, genre)
-        query = addQueryOnList(query, Comic.publishers_raw, Publisher.name, publisher)
 
         if hasValue(volume):
             try:
@@ -992,8 +1002,9 @@ class Library:
                 order = order[1:]
             else:
                 order_desc = False
-            if order == "id":
-                order_key = Comic.id
+                
+            if order == "issue":
+                order_key = Comic.issue_num
             if order == "series":
                 order_key = Comic.series
             elif order == "modified":
@@ -1004,12 +1015,12 @@ class Library:
                 order_key = Comic.lastread_ts
             elif order == "volume":
                 order_key = Comic.volume
-            elif order == "issue":
-                order_key = Comic.issue_num
+            elif order == "id":
+                order_key = Comic.id
             elif order == "date":
                 order_key = Comic.date
-            # elif order == "publisher":
-            #     order_key = Comic.publisher
+            elif order == "publisher":
+                order_key = Comic.publisher
             elif order == "language":
                 order_key = Comic.language
             elif order == "title":

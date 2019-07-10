@@ -135,7 +135,7 @@ class Monitor():
         self.scan()
         
         # remove the timer
-        if self.eventProcessingTimer is not None:
+        if self.eventProcessing is not None:
             self.eventProcessingTimer = None
             
         self.mutex.release()

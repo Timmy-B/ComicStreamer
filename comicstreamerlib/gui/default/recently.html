@@ -9,7 +9,7 @@
             {% block comic %}
             <li>
                 <a href="{{handler.webroot}}/comic/{{comic.id}}/reader" > <!-- target="_blank" -->
-                    <img class="recently_comic" src="{{handler.webroot}}/comic/{{comic.id}}/thumbnail?api_key={{api_key}}">
+                    <img class="recently_comic" src="{{handler.webroot}}/comic/{{comic.fingerprint}}/thumbnail?api_key={{api_key}}">
                 </a>
                 <span class="comic_caption"><a href="{{handler.webroot}}/comiclist/browse?series={{comic.series}}">{{comic.series}} #{{comic.issue}}</a></span>
 
@@ -29,7 +29,7 @@
             {% block comic %}
             <li>
                 <a href="{{handler.webroot}}/comic/{{comic.id}}/reader" > <!-- target="_blank" -->
-                    <img class="recently_comic"  src="{{handler.webroot}}/comic/{{comic.id}}/thumbnail?api_key={{api_key}}">
+                    <img class="recently_comic"  src="{{handler.webroot}}/comic/{{comic.fingerprint}}/thumbnail?api_key={{api_key}}">
                 </a>
                 <span class="comic_caption"><a href="{{handler.webroot}}/comiclist/browse?series={{comic.series}}">{{comic.series}} #{{comic.issue}}</a></span>
             </li>
